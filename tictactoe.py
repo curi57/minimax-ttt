@@ -89,14 +89,15 @@ def terminal(board):
     return is_completed or winner(board) is not None
 
 
-def utility(board):
-    """
-    Returns 1 if X has won the game, -1 if O has won, 0 otherwise.
-    """
+def utility(board):  
     winner_player = winner(board)
-    has_winner = winner_player is not None 
-    return 
-
+    if winner_player is None:
+        return 0
+    elif winner_player == X:
+        return 1
+    else:
+        return -1
+    
 
 def minimax(board):
     """
