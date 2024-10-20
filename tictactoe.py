@@ -103,4 +103,28 @@ def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    
+    avaiable_actions = actions(board)
+    scores = []
+    for action in avaiable_actions:
+        score = track_score(result(board, action))
+        scores.append(score)
+
+    #find the highest score
+
+    #get an index from that score
+
+    #return that index from avaiable_actions
+
+    
+
+def track_score(result_board):
+
+    avaiable_actions_from_result_board = actions(result_board)
+                                        
+    for action in avaiable_actions_from_result_board:
+        result_board = result(result_board, action)
+        if not terminal(result_board):
+            track_score(result_board)
+
+        return utility(result_board)    
