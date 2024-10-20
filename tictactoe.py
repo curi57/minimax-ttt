@@ -94,10 +94,16 @@ def utility(board):
 def minimax(board):  
     avaiable_actions = actions(board)
     scores = []
+
+    print(f"Board: {board}")
+    print(f"Actions: {avaiable_actions}")
+    print("----------------------------")
+
     # can be optimized by findind a score equal to the number of possivel ending games
     for action in avaiable_actions: 
+        print(f"Action: {action}")
         score = track_score(result(copy.deepcopy(board), action), 0)
-        print(f"board: {board},\n actions: {avaiable_actions},\n score: {score}")
+        print(f"score: {score}")
         scores.append((action, score))
     
     optimal_action = None
@@ -107,8 +113,8 @@ def minimax(board):
             (_, curr_optimal_score) = optimal_action
             if score > curr_optimal_score:
                 optimal_action = s
-            
-        optimal_action =  s
+        else:
+            optimal_action = s
     
     if optimal_action is None:
         raise Exception("No action found")
