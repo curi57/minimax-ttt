@@ -42,10 +42,7 @@ def actions(board):
     return possible_actions
 
 
-def result(board, action):  
-    #value = board[action[0]][action[1]]
-    #if value != EMPTY:
-        #raise Exception("This move has already been made")
+def result(board, action):    
     board[action[0]][action[1]] = player(board)
     return board
 
@@ -94,10 +91,7 @@ def utility(board):
         return -1
     
 
-def minimax(board):
-
-    print(f"initial board: {board}")
-  
+def minimax(board):  
     avaiable_actions = actions(board)
     scores = []
     # can be optimized by findind a score equal to the number of possivel ending games
