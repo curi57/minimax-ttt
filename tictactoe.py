@@ -1,8 +1,5 @@
-"""
-Tic Tac Toe Player
-"""
+import copy
 
-import math
 
 X = "X"
 O = "O"
@@ -46,13 +43,11 @@ def actions(board):
 
 
 def result(board, action):  
-    (i, j) = action
-
-    value = board[i][j]
-    if value != EMPTY:
-        raise Exception("this move has already been made")
-
-    board[i][j] = player(board)
+    #value = board[action[0]][action[1]]
+    #if value != EMPTY:
+        #raise Exception("This move has already been made")
+    board[action[0]][action[1]] = player(board)
+    return board
 
 
 def winner(board):
@@ -100,31 +95,41 @@ def utility(board):
     
 
 def minimax(board):
-    """
-    Returns the optimal action for the current player on the board.
-    """
-    
+
+    print(f"initial board: {board}")
+  
     avaiable_actions = actions(board)
     scores = []
-    for action in avaiable_actions:
-        score = track_score(result(board, action))
-        scores.append(score)
+    # can be optimized by findind a score equal to the number of possivel ending games
+    for action in avaiable_actions: 
+        score = track_score(result(copy.deepcopy(board), action), 0)
+        print(f"board: {board},\n actions: {avaiable_actions},\n score: {score}")
+        scores.append((action, score))
+    
+    optimal_action = None
+    for s in scores:
+        (action, score) = s 
+        if optimal_action is not None:
+            (_, curr_optimal_score) = optimal_action
+            if score > curr_optimal_score:
+                optimal_action = s
+            
+        optimal_action =  s
+    
+    if optimal_action is None:
+        raise Exception("No action found")
 
-    #find the highest score
-
-    #get an index from that score
-
-    #return that index from avaiable_actions
-
+    return optimal_action[0]
     
 
-def track_score(result_board):
+def track_score(result_board, curr_score):
 
     avaiable_actions_from_result_board = actions(result_board)
                                         
     for action in avaiable_actions_from_result_board:
-        result_board = result(result_board, action)
-        if not terminal(result_board):
-            track_score(result_board)
-
-        return utility(result_board)    
+        if not terminal(result(result_board, action)):
+            curr_score = track_score(copy.deepcopy(result_board), curr_score)
+        
+        updated_score = curr_score + utility(result_board)
+        print(updated_score)
+        return updated_score 
