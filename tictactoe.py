@@ -50,22 +50,13 @@ def result(board, action):
 
 def winner(board):
 
-    action_values = []
-    no_empties = 0
     for game in winning_games:
-        for action in game:
-            (i, j) = action
-            board_action = board[i][j]
-            if board_action != EMPTY:
-                action_values.append(board_action)
-                no_empties += 1
-        action_values_set = set(action_values)
-        if no_empties == 3 and len(action_values_set) == 1:
-            return action_values_set.pop()
-        
-        action_values.clear()
-        no_empties = 0
-                                                                     
+        (i0, j0), (i1, j1), (i2, j2) = game 
+        if board[i0][j0] == X and board[i1][j1] == X and board[i2][j2] == X:
+            return X
+        elif board[i0][j0] == O and board[i1][j1] == O and board[i2][j2] == O:
+            return O
+                                                                         
     return None 
 
 
@@ -87,87 +78,39 @@ def utility(board):
         return 0
     elif winner_player == X:
         return 1
-    elif winner_player == O:
+    else:
         return -1
     
 
-def minimax(board):  
-
-    print("------------------------\n\n")
-
-    #avaiable_actions = actions(board)
-    #scores = []
+def minimax(board): # call minimax itself 
+      
+    optimal = track_board(board)
+    return optimal[0] 
     
-    #player_turn = player(board)
-    #next_player_turn = X if player_turn == O else X  
-    #initial_move_evaluation = float('inf') if next_player_turn == X else float('-inf')
-    #for action in avaiable_actions: 
-    #    score = track_score(result(copy.deepcopy(board), action), next_player_turn, initial_move_evaluation) # result board from player turn move is being passed
-    #    scores.append((action, score))
-
-    avaiable_actions = actions(board)
-
-    print(f"avaiable_actions: {avaiable_actions}")
-
-    scores = []
-    player_turn = player(board)
-
-    print(f"player_turn: {player_turn}")
-    for action in avaiable_actions:
-        score = track_moves(board, action, player_turn, float('inf') if player_turn == X else float('-inf'))
-        scores.append((action, score))
-
     
-    optimal = None  
-    for s in scores:
-        (action, score) = s
-        print(f"action {action} : {score}")
-        if optimal is not None:
-            (_, curr_optimal) = optimal
+def track_board(board_state):
+    
+    player_turn = player(board_state) 
+
+    actions_from_result_board_state = actions(board_state)
+   
+    # How to link an action to the optimal move?
+    action_evaluation = (None, float('-inf') if player_turn == X else float('inf'))
+    #linked_action = None 
+
+    for action in actions_from_result_board_state:
+        new_board_state = result(copy.deepcopy(board_state), action) 
+        if not terminal(new_board_state):
+            (_, next_evaluation) = track_board(new_board_state)
             if player_turn == X:
-                if score >= curr_optimal: # sortir decisões com evaluations iguais
-                    optimal = s
-            elif player_turn == O:
-                if score < curr_optimal:
-                    optimal = s
+                if next_evaluation >= action_evaluation[1]:
+                    action_evaluation = (action, next_evaluation)
+            else:
+                if next_evaluation <= action_evaluation[1]:
+                    action_evaluation = (action, next_evaluation)
+
+            #action_evaluation = max(track_board(new_board_state), action_evaluation) if player_turn == X else min(track_board(new_board_state), action_evaluation)   
         else:
-            optimal = s
-        
-    if optimal is None:
-        raise Exception("No action found")
-
-    return optimal[0]
-
-
-def track_moves(from_board, action, player_turn, curr_evaluation):
-    
-    result_board = result(from_board, action) # board resultante da action passada via parâmetro (jogador atual)
-    avaiable_actions_from_result_board = actions(result_board) # actions disponíveis para o board resultante depois da jogada do jogador atual (essas actions estarão disponíveis 
-    # para o próximo jogador)
-
-    if not terminal(result_board):
-        #next_player_turn = X if player_turn == O else X
-        for avaiable_action in avaiable_actions_from_result_board:
-            result_board_evaluation = track_moves(copy.deepcopy(result_board), avaiable_action, player_turn, curr_evaluation)
-            return min(result_board_evaluation, curr_evaluation) if player_turn == X else max(result_board_evaluation, curr_evaluation)        
-    else:
-        terminal_evaluation = utility(result_board)
-        print(f"terminal_evaluation: {terminal_evaluation}")
-
-        return terminal_evaluation
-    
-
-def track_score(result_board, player_turn, move_evaluation):
-
-    avaiable_actions_from_result_board = actions(result_board)
-                                        
-    for action in avaiable_actions_from_result_board:
-        next_result_board = result(result_board, action)
-        if not terminal(next_result_board):
-            next_move_layer_evaluation = track_score(copy.deepcopy(next_result_board), player(next_result_board), move_evaluation)
-            if player_turn == X:
-                return min(next_move_layer_evaluation, move_evaluation)
-            elif player_turn == O:
-                return max(next_move_layer_evaluation, move_evaluation)
-        else:
-            return utility(result_board)
+            action_evaluation = (action, utility(new_board_state))
+              
+    return action_evaluation 
