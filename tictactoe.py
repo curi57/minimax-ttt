@@ -82,8 +82,11 @@ def utility(board):
         return -1
     
 
-def minimax(board): # call minimax itself 
-      
+def minimax(board): 
+    
+    if terminal(board):
+        return None 
+
     optimal = track_board(board)
     return optimal[0] 
     
@@ -94,10 +97,8 @@ def track_board(board_state):
 
     actions_from_result_board_state = actions(board_state)
    
-    # How to link an action to the optimal move?
     action_evaluation = (None, float('-inf') if player_turn == X else float('inf'))
-    #linked_action = None 
-
+    
     for action in actions_from_result_board_state:
         new_board_state = result(copy.deepcopy(board_state), action) 
         if not terminal(new_board_state):
@@ -108,8 +109,6 @@ def track_board(board_state):
             else:
                 if next_evaluation <= action_evaluation[1]:
                     action_evaluation = (action, next_evaluation)
-
-            #action_evaluation = max(track_board(new_board_state), action_evaluation) if player_turn == X else min(track_board(new_board_state), action_evaluation)   
         else:
             action_evaluation = (action, utility(new_board_state))
               
